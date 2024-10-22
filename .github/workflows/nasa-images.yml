@@ -38,8 +38,7 @@ jobs:
           
           # Establecer la salida del paso
           echo "::set-output name=matrix::$MATRIX"
-        outputs:
-          matrix: ${{ steps.set_matrix.outputs.matrix }}
+        # En este punto eliminamos `outputs` porque no es necesario
 
       - name: Set matrix strategy dynamically
         uses: actions/github-script@v6
