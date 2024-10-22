@@ -24,16 +24,14 @@ jobs:
         id: load_dates
         run: |
           DATES=$(jq -r '.dates[]' data.json)
-          echo "::set-output name=dates::$DATES"
-
-      - name: Set up dates for matrix
-        run: |
-          DATES="${{ steps.load_dates.outputs.dates }}"
           echo "$DATES" | awk '{print "{\"date\": \"" $1 "\"}"}' | jq -s '.' > dates-matrix.json
-          
+
+      - name: Set dates as output
+        id: matrix_setup
+        run: echo "::set-output name=matrix::{ \"include\": $(cat dates-matrix.json) }"
+
     strategy:
-      matrix:
-        include: ${{ fromJson(format('{{}}', steps.load_dates.outputs.dates)) }}
+      matrix: ${{ fromJson(steps.matrix_setup.outputs.matrix) }}
 
     steps:
       - name: Checkout repository
