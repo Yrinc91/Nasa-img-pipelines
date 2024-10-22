@@ -29,11 +29,6 @@ jobs:
     needs: load_dates
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        date: [${{ fromJson(needs.load_dates.outputs.dates) }}]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
