@@ -26,12 +26,14 @@ jobs:
           DATES=$(jq -r '.dates[]' data.json)
           echo "$DATES" | awk '{print "{\"date\": \"" $1 "\"}"}' | jq -s '.' > dates-matrix.json
 
-      - name: Set dates as output
+      - name: Read dates matrix
         id: matrix_setup
-        run: echo "matrix=$(cat dates-matrix.json)" >> $GITHUB_ENV
+        run: |
+          echo "MATRIX=$(cat dates-matrix.json)" >> $GITHUB_ENV
 
     strategy:
-      matrix: ${{ fromJson(env.matrix) }}
+      matrix: 
+        include: ${{ fromJson(env.MATRIX) }}
 
     steps:
       - name: Checkout repository
