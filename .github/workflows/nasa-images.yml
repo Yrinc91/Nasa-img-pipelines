@@ -9,18 +9,31 @@ jobs:
   download_images:
     runs-on: ubuntu-latest
     continue-on-error: true
-    
-    strategy:
-      matrix:
-        include:
-          - date: "2023-10-01"
-          - date: "2023-10-02"
-          - date: "2023-10-03"
-          - date: "2023-10-04"
-          - date: "2023-10-05"
 
     env:
       API_KEY: ${{ secrets.NASA_API_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up jq for JSON parsing
+        run: sudo apt-get install -y jq
+
+      - name: Load dates from data.json
+        id: load_dates
+        run: |
+          DATES=$(jq -r '.dates[]' data.json)
+          echo "::set-output name=dates::$DATES"
+
+      - name: Set up dates for matrix
+        run: |
+          DATES="${{ steps.load_dates.outputs.dates }}"
+          echo "$DATES" | awk '{print "{\"date\": \"" $1 "\"}"}' | jq -s '.' > dates-matrix.json
+          
+    strategy:
+      matrix:
+        include: ${{ fromJson(format('{{}}', steps.load_dates.outputs.dates)) }}
 
     steps:
       - name: Checkout repository
