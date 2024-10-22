@@ -28,7 +28,8 @@ jobs:
 
       - name: Set dates as output
         id: matrix_setup
-        run: echo "::set-output name=matrix::{ \"include\": $(cat dates-matrix.json) }"
+        run: |
+          echo "matrix={ \"include\": $(cat dates-matrix.json) }" >> $GITHUB_OUTPUT
 
     strategy:
       matrix: ${{ fromJson(steps.matrix_setup.outputs.matrix) }}
